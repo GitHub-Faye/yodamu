@@ -230,11 +230,11 @@ class OBB(Detect):
 class Pose(Detect):
     """YOLO Pose head for keypoints models."""
 
-    def __init__(self, nc=80, kpt_shape=(17, 3), ch=()):
+    def __init__(self, nc=80, kpt_shape=None, ch=()):
         """Initialize YOLO network with default parameters and Convolutional Layers."""
         super().__init__(nc, ch)
-        self.kpt_shape = kpt_shape  # number of keypoints, number of dims (2 for x,y or 3 for x,y,visible)
-        self.nk = kpt_shape[0] * kpt_shape[1]  # number of keypoints total
+        self.kpt_shape = kpt_shape if kpt_shape is not None else (17, 3)  # number of keypoints, number of dims
+        self.nk = self.kpt_shape[0] * self.kpt_shape[1]  # number of keypoints total
 
         c4 = max(ch[0] // 4, self.nk)
         self.cv4 = nn.ModuleList(nn.Sequential(Conv(x, c4, 3), Conv(c4, c4, 3), nn.Conv2d(c4, self.nk, 1)) for x in ch)

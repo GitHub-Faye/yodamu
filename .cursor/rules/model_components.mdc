@@ -1,0 +1,49 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# 模型创建流程组件
+
+## 核心模型组件
+
+- 基础模型类: [ultralytics/nn/tasks.py](mdc:ultralytics/nn/tasks.py) 中的 `BaseModel` 类是所有模型的基类
+- 检测模型: [ultralytics/nn/tasks.py](mdc:ultralytics/nn/tasks.py) 中的 `DetectionModel` 类用于目标检测任务
+- 分割模型: [ultralytics/nn/tasks.py](mdc:ultralytics/nn/tasks.py) 中的 `SegmentationModel` 类用于图像分割任务
+- 姿态模型: [ultralytics/nn/tasks.py](mdc:ultralytics/nn/tasks.py) 中的 `PoseModel` 类用于姿态估计任务
+- OBB模型: [ultralytics/nn/tasks.py](mdc:ultralytics/nn/tasks.py) 中的 `OBBModel` 类用于方向边界框检测
+- 分类模型: [ultralytics/nn/tasks.py](mdc:ultralytics/nn/tasks.py) 中的 `ClassificationModel` 类用于图像分类任务
+- RTDETR检测模型: [ultralytics/nn/tasks.py](mdc:ultralytics/nn/tasks.py) 中的 `RTDETRDetectionModel` 类
+- 世界模型: [ultralytics/nn/tasks.py](mdc:ultralytics/nn/tasks.py) 中的 `WorldModel` 类
+
+## YOLO模型封装
+
+- YOLO类: [ultralytics/models/yolo/model.py](mdc:ultralytics/models/yolo/model.py) 中的 `YOLO` 类是用户接口的主要入口点
+- YOLOWorld类: [ultralytics/models/yolo/model.py](mdc:ultralytics/models/yolo/model.py) 中的 `YOLOWorld` 类是专门用于YOLOWorld模型的接口
+
+## 引擎组件
+
+- 模型基类: [ultralytics/engine/model.py](mdc:ultralytics/engine/model.py) 中的 `Model` 类是所有YOLO模型的基类
+- 预测器: [ultralytics/engine/predictor.py](mdc:ultralytics/engine/predictor.py) 包含用于预测的组件
+- 训练器: [ultralytics/engine/trainer.py](mdc:ultralytics/engine/trainer.py) 包含用于训练的组件
+- 验证器: [ultralytics/engine/validator.py](mdc:ultralytics/engine/validator.py) 包含用于验证的组件
+- 导出器: [ultralytics/engine/exporter.py](mdc:ultralytics/engine/exporter.py) 包含用于导出模型的组件
+- 结果处理: [ultralytics/engine/results.py](mdc:ultralytics/engine/results.py) 包含用于处理结果的组件
+
+## 神经网络模块
+
+- 网络模块: [ultralytics/nn/modules/](mdc:ultralytics/nn/modules) 文件夹包含各种神经网络层和模块
+- 模型任务: [ultralytics/nn/tasks.py](mdc:ultralytics/nn/tasks.py) 定义了不同任务的模型结构和行为
+- 自动后端: [ultralytics/nn/autobackend.py](mdc:ultralytics/nn/autobackend.py) 用于自动处理不同类型的模型后端
+
+## 模型配置
+
+- 模型配置文件: [ultralytics/cfg/models/](mdc:ultralytics/cfg/models) 文件夹包含各种模型的YAML配置文件
+
+## 创建流程概述
+
+1. 用户通过 `YOLO` 类初始化一个模型实例
+2. 根据输入的模型路径或配置文件，加载现有模型或创建新模型
+3. 对于新模型，通过 `nn/tasks.py` 中定义的相应任务模型类创建模型结构
+4. 模型结构基于配置文件 (`cfg/models/`) 中定义的架构
+5. 训练、验证、预测等操作由 `engine/` 目录中的相应组件处理

@@ -1,0 +1,50 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+# YOLOv12 模型使用指南
+
+## 模型加载
+```python
+from ultralytics import YOLO
+
+# 加载预训练模型
+model = YOLO('yolov12n.pt')  # 可选: n/s/m/l/x 不同规模
+```
+
+## 模型训练
+```python
+# 训练模型
+results = model.train(
+    data='coco.yaml',  # 数据集配置
+    epochs=600,  # 训练轮数
+    batch=256,  # 批次大小
+    imgsz=640,  # 图像大小
+    device="0,1,2,3",  # 使用的GPU
+)
+```
+
+## 模型验证
+```python
+# 验证模型性能
+metrics = model.val(data='coco.yaml', save_json=True)
+```
+
+## 模型预测
+```python
+# 目标检测预测
+results = model.predict(source="path/to/image.jpg", imgsz=640, conf=0.25)
+results[0].plot()  # 可视化结果
+```
+
+## 模型导出
+```python
+# 导出为其他格式
+model.export(format="engine", half=True)  # 导出为TensorRT引擎
+# 或
+model.export(format="onnx")  # 导出为ONNX
+```
+
+## 模型部署
+查看 [app.py](mdc:app.py) 了解如何使用Gradio创建Web界面部署模型。

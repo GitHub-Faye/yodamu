@@ -1,0 +1,71 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# YOLO模型工作流程
+
+## 模型创建流程
+
+1. **初始化模型**：
+   - 使用 `YOLO` 类初始化：`model = YOLO('yolov8n.pt')`
+   - 或从配置文件创建：`model = YOLO('yolov8n.yaml')`
+
+2. **模型加载过程**：
+   - 在 [ultralytics/models/yolo/model.py](mdc:ultralytics/models/yolo/model.py) 中的 `YOLO.__init__` 方法
+   - 调用 [ultralytics/engine/model.py](mdc:ultralytics/engine/model.py) 中的 `Model._load` 或 `Model._new` 方法
+   - 使用 [ultralytics/nn/tasks.py](mdc:ultralytics/nn/tasks.py) 中的 `attempt_load_one_weight` 或 `yaml_model_load` 函数
+
+3. **模型结构创建**：
+   - 对于新模型，通过 [ultralytics/nn/tasks.py](mdc:ultralytics/nn/tasks.py) 中的 `parse_model` 函数解析配置
+   - 根据配置创建相应的任务模型实例（DetectionModel, SegmentationModel 等）
+
+## 训练工作流程
+
+1. **训练准备**：
+   - 调用模型的 `train` 方法：`model.train(data='coco8.yaml', epochs=100)`
+   - 在 [ultralytics/engine/model.py](mdc:ultralytics/engine/model.py) 中的 `Model.train` 方法
+
+2. **训练器初始化**：
+   - 根据任务创建相应的训练器，如 [ultralytics/models/yolo/detect/trainer.py](mdc:ultralytics/models/yolo/detect/trainer.py) 中的 `DetectionTrainer`
+
+3. **训练过程**：
+   - 在 [ultralytics/engine/trainer.py](mdc:ultralytics/engine/trainer.py) 中的 `BaseTrainer.train` 方法
+   - 数据加载、前向传播、损失计算、反向传播、参数更新
+
+## 验证工作流程
+
+1. **验证准备**：
+   - 调用模型的 `val` 方法：`model.val(data='coco8.yaml')`
+   - 在 [ultralytics/engine/model.py](mdc:ultralytics/engine/model.py) 中的 `Model.val` 方法
+
+2. **验证器初始化**：
+   - 根据任务创建相应的验证器，如 [ultralytics/models/yolo/detect/validator.py](mdc:ultralytics/models/yolo/detect/validator.py) 中的 `DetectionValidator`
+
+3. **验证过程**：
+   - 在 [ultralytics/engine/validator.py](mdc:ultralytics/engine/validator.py) 中的 `BaseValidator.validate` 方法
+   - 数据加载、模型推理、指标计算
+
+## 预测工作流程
+
+1. **预测准备**：
+   - 调用模型的 `predict` 方法：`model.predict('image.jpg')`
+   - 在 [ultralytics/engine/model.py](mdc:ultralytics/engine/model.py) 中的 `Model.predict` 方法
+
+2. **预测器初始化**：
+   - 根据任务创建相应的预测器，如 [ultralytics/models/yolo/detect/predictor.py](mdc:ultralytics/models/yolo/detect/predictor.py) 中的 `DetectionPredictor`
+
+3. **预测过程**：
+   - 在 [ultralytics/engine/predictor.py](mdc:ultralytics/engine/predictor.py) 中的 `BasePredictor.predict` 方法
+   - 数据预处理、模型推理、后处理、结果返回
+
+## 导出工作流程
+
+1. **导出准备**：
+   - 调用模型的 `export` 方法：`model.export(format='onnx')`
+   - 在 [ultralytics/engine/model.py](mdc:ultralytics/engine/model.py) 中的 `Model.export` 方法
+
+2. **导出过程**：
+   - 在 [ultralytics/engine/exporter.py](mdc:ultralytics/engine/exporter.py) 中的 `Exporter.export` 方法
+   - 根据格式选择相应的导出函数
+   - 模型转换、优化、保存

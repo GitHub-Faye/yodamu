@@ -1,0 +1,58 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# 训练流程组件
+
+本文档概述了YOLOv8训练流程中的关键组件及其所在文件夹。
+
+## 训练入口点
+
+- 用户接口: [ultralytics/models/yolo/model.py](mdc:ultralytics/models/yolo/model.py) 中的 `YOLO` 类
+  - 通过 `model = YOLO('yolov8n.pt')` 然后 `model.train()` 启动训练
+- 模型管理器: [ultralytics/engine/model.py](mdc:ultralytics/engine/model.py) 中的 `Model` 类
+  - 包含 `Model.train()` 方法，负责训练流程管理
+
+## 核心训练组件
+
+- 基础训练器: [ultralytics/engine/trainer.py](mdc:ultralytics/engine/trainer.py) 中的 `BaseTrainer` 类
+  - 定义所有训练流程的基本逻辑，包括训练循环、梯度计算等
+
+## 任务特定训练器
+
+- 检测训练器: [ultralytics/models/yolo/detect/trainer.py](mdc:ultralytics/models/yolo/detect/trainer.py) 中的 `DetectionTrainer` 类
+- 分割训练器: [ultralytics/models/yolo/segment/trainer.py](mdc:ultralytics/models/yolo/segment/trainer.py) 中的 `SegmentationTrainer` 类
+- 姿态训练器: [ultralytics/models/yolo/pose/trainer.py](mdc:ultralytics/models/yolo/pose/trainer.py) 中的 `PoseTrainer` 类
+- 分类训练器: [ultralytics/models/yolo/classify/trainer.py](mdc:ultralytics/models/yolo/classify/trainer.py) 中的 `ClassificationTrainer` 类
+- OBB训练器: [ultralytics/models/yolo/obb/trainer.py](mdc:ultralytics/models/yolo/obb/trainer.py) 中的 `OBBTrainer` 类
+
+## 数据处理组件
+
+- 数据集加载: [ultralytics/data/dataset.py](mdc:ultralytics/data/dataset.py) 负责创建和管理训练数据集
+- 数据加载器: [ultralytics/data/build.py](mdc:ultralytics/data/build.py) 创建数据加载器
+- 数据增强: [ultralytics/data/augment.py](mdc:ultralytics/data/augment.py) 提供数据增强方法
+
+## 模型组件
+
+- 模型定义: [ultralytics/nn/tasks.py](mdc:ultralytics/nn/tasks.py) 包含各种任务的模型类
+- 网络模块: [ultralytics/nn/modules](mdc:ultralytics/nn/modules) 文件夹包含构建模型的基本组件
+- 模型配置: [ultralytics/cfg/models](mdc:ultralytics/cfg/models) 文件夹包含YAML格式的模型配置
+
+## 监控与回调
+
+- 回调组件: [ultralytics/utils/callbacks](mdc:ultralytics/utils/callbacks) 文件夹包含训练过程中的回调函数
+  - 提供日志记录、模型保存、早停等功能
+
+## 损失函数
+
+- 检测损失: [ultralytics/models/yolo/detect/loss.py](mdc:ultralytics/models/yolo/detect/loss.py) 中的损失函数
+- 分割损失: [ultralytics/models/yolo/segment/loss.py](mdc:ultralytics/models/yolo/segment/loss.py) 中的损失函数
+- 姿态损失: [ultralytics/models/yolo/pose/loss.py](mdc:ultralytics/models/yolo/pose/loss.py) 中的损失函数
+- 分类损失: [ultralytics/models/yolo/classify/loss.py](mdc:ultralytics/models/yolo/classify/loss.py) 中的损失函数
+- OBB损失: [ultralytics/models/yolo/obb/loss.py](mdc:ultralytics/models/yolo/obb/loss.py) 中的损失函数
+
+## 优化器和学习率调度器
+
+- 优化器配置: [ultralytics/engine/trainer.py](mdc:ultralytics/engine/trainer.py) 中的优化器设置
+- 学习率调度器: [ultralytics/utils/torch_utils.py](mdc:ultralytics/utils/torch_utils.py) 包含学习率调度相关函数

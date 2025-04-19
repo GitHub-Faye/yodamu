@@ -443,10 +443,42 @@ class v8SegmentationLoss(v8DetectionLoss):
         return loss / fg_mask.sum()
 
 
+class WingLoss(nn.Module):
+    """Wing loss for keypoint regression.
+    
+    Reference: https://arxiv.org/abs/1711.06753
+    """
+    def __init__(self, w=10, epsilon=2):
+        super().__init__()
+        self.w = w
+        self.epsilon = epsilon
+        self.C = w - w * torch.log(1 + w/epsilon)
+
+    def forward(self, pred, target, mask=None):
+        """Calculate wing loss.
+        
+        Args:
+            pred (torch.Tensor): Predicted keypoints, shape (N, K, 2)
+            target (torch.Tensor): Target keypoints, shape (N, K, 2)
+            mask (torch.Tensor, optional): Visibility mask, shape (N, K)
+            
+        Returns:
+            torch.Tensor: Calculated wing loss
+        """
+        diff = torch.abs(pred - target)
+        losses = torch.where(
+            diff < self.w,
+            self.w * torch.log(1 + diff / self.epsilon),
+            diff - self.C
+        )
+        if mask is not None:
+            losses = losses * mask.unsqueeze(-1)
+        return losses.mean()
+
 class v8PoseLoss(v8DetectionLoss):
     """Criterion class for computing training losses."""
 
-    def __init__(self, model):  # model must be de-paralleled
+    def __init__(self, model, kpt_loss_weight=0.5):  # model must be de-paralleled
         """Initializes v8PoseLoss with model, sets keypoint variables and declares a keypoint loss instance."""
         super().__init__(model)
         self.kpt_shape = model.model[-1].kpt_shape
@@ -455,6 +487,8 @@ class v8PoseLoss(v8DetectionLoss):
         nkpt = self.kpt_shape[0]  # number of keypoints
         sigmas = torch.from_numpy(OKS_SIGMA).to(self.device) if is_pose else torch.ones(nkpt, device=self.device) / nkpt
         self.keypoint_loss = KeypointLoss(sigmas=sigmas)
+        self.wing_loss = WingLoss()
+        self.kpt_loss_weight = kpt_loss_weight
 
     def __call__(self, preds, batch):
         """Calculate the total loss and detach it."""
@@ -590,7 +624,13 @@ class v8PoseLoss(v8DetectionLoss):
             area = xyxy2xywh(target_bboxes[masks])[:, 2:].prod(1, keepdim=True)
             pred_kpt = pred_kpts[masks]
             kpt_mask = gt_kpt[..., 2] != 0 if gt_kpt.shape[-1] == 3 else torch.full_like(gt_kpt[..., 0], True)
-            kpts_loss = self.keypoint_loss(pred_kpt, gt_kpt, kpt_mask, area)  # pose loss
+            
+            # Use wing loss for keypoint coordinates (x,y)
+            kpts_loss = self.wing_loss(pred_kpt[..., :2], gt_kpt[..., :2], kpt_mask) * self.kpt_loss_weight
+            
+            # Keep original visibility loss
+            if pred_kpt.shape[-1] == 3:
+                kpts_loss += self.keypoint_loss(pred_kpt, gt_kpt, kpt_mask, area) * 0.1  # reduced weight
 
             if pred_kpt.shape[-1] == 3:
                 kpts_obj_loss = self.bce_pose(pred_kpt[..., 2], kpt_mask.float())  # keypoint obj loss

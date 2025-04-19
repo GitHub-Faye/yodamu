@@ -1,0 +1,47 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# YOLO模型结构
+
+## 模型架构层次结构
+
+YOLO系列模型在代码库中具有清晰的层次结构：
+
+1. **用户接口层**：[ultralytics/models/yolo/model.py](mdc:ultralytics/models/yolo/model.py) 中的 `YOLO` 类
+2. **模型管理层**：[ultralytics/engine/model.py](mdc:ultralytics/engine/model.py) 中的 `Model` 类
+3. **任务特定模型层**：[ultralytics/nn/tasks.py](mdc:ultralytics/nn/tasks.py) 中的各种任务特定模型类
+4. **神经网络层**：[ultralytics/nn/modules/](mdc:ultralytics/nn/modules) 中定义的各种网络模块
+
+## 模型类型和变体
+
+- 检测模型：YOLOv8n, YOLOv8s, YOLOv8m, YOLOv8l, YOLOv8x
+- 分割模型：YOLOv8n-seg, YOLOv8s-seg, YOLOv8m-seg, YOLOv8l-seg, YOLOv8x-seg
+- 姿态模型：YOLOv8n-pose, YOLOv8s-pose, YOLOv8m-pose, YOLOv8l-pose, YOLOv8x-pose
+- 分类模型：YOLOv8n-cls, YOLOv8s-cls, YOLOv8m-cls, YOLOv8l-cls, YOLOv8x-cls
+- OBB模型：YOLOv8n-obb, YOLOv8s-obb, YOLOv8m-obb, YOLOv8l-obb, YOLOv8x-obb
+- 世界模型：YOLOv8s-world
+- RT-DETR模型：RTDETR-l, RTDETR-x
+
+## 主要网络模块
+
+[ultralytics/nn/modules/](mdc:ultralytics/nn/modules) 目录包含了多种网络模块，如：
+
+- 卷积模块：Conv, RepConv, GhostConv, DWConv
+- 注意力模块：C2fAttn, PSA, C2fPSA
+- 颈部模块：SPPF, SPPELAN, C3, C2f
+- 头部模块：Detect, Segment, Pose, OBB, WorldDetect
+
+## 模型配置
+
+各种模型配置存储在 [ultralytics/cfg/models/](mdc:ultralytics/cfg/models) 目录中，包含：
+
+- v3/：YOLOv3模型配置
+- v5/：YOLOv5模型配置
+- v6/：YOLOv6模型配置
+- v8/：YOLOv8模型配置（检测、分割、姿态、分类、OBB）
+- v9/：YOLOv9模型配置
+- v10/：YOLOv10模型配置
+- v12/：YOLOv12模型配置
+- rt-detr/：RT-DETR模型配置

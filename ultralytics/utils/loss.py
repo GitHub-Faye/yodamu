@@ -452,7 +452,7 @@ class WingLoss(nn.Module):
         super().__init__()
         self.w = w
         self.epsilon = epsilon
-        self.C = w - w * torch.log(1 + w/epsilon)
+        self.C = w - w * torch.log(torch.tensor(1 + w/epsilon, dtype=torch.float))
 
     def forward(self, pred, target, mask=None):
         """Calculate wing loss.
@@ -478,7 +478,7 @@ class WingLoss(nn.Module):
 class v8PoseLoss(v8DetectionLoss):
     """Criterion class for computing training losses."""
 
-    def __init__(self, model, kpt_loss_weight=0.5):  # model must be de-paralleled
+    def __init__(self, model, kpt_loss_weight=1):  # model must be de-paralleled
         """Initializes v8PoseLoss with model, sets keypoint variables and declares a keypoint loss instance."""
         super().__init__(model)
         self.kpt_shape = model.model[-1].kpt_shape
